@@ -1,115 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Shlok AI - Free AI Chatbot</title>
-
-  <meta name="description" content="Shlok AI is a free AI chatbot with voice input and smart answers.">
+  <title>Shlok AI</title>
 
   <style>
     body {
-      margin: 0;
-      font-family: Arial;
-      background: #343541;
-      color: white;
+      margin:0;
+      font-family:Arial;
+      background:#343541;
+      color:white;
     }
 
-    .container {
-      display: flex;
-      height: 100vh;
-    }
+    .container { display:flex; height:100vh; }
 
     .sidebar {
-      width: 250px;
-      background: #202123;
-      padding: 15px;
+      width:250px;
+      background:#202123;
+      padding:15px;
     }
 
     .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      flex:1;
+      display:flex;
+      flex-direction:column;
     }
 
     #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px;
+      flex:1;
+      overflow-y:auto;
+      padding:15px;
     }
 
     .msg {
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 10px;
-      max-width: 75%;
-      animation: fade 0.3s ease;
+      padding:12px;
+      margin:10px 0;
+      border-radius:12px;
+      max-width:70%;
+      animation:fade 0.3s;
     }
 
     .user {
-      background: #10a37f;
-      margin-left: auto;
+      background:#10a37f;
+      margin-left:auto;
     }
 
     .bot {
-      background: #444654;
+      background:#444654;
     }
 
     @keyframes fade {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1;}
+      from {opacity:0; transform:translateY(10px);}
+      to {opacity:1;}
     }
 
     .input-area {
-      padding: 10px;
-      background: #40414f;
-      display: flex;
-      justify-content: center;
+      padding:10px;
+      background:#40414f;
+      display:flex;
+      justify-content:center;
     }
 
     .input-box {
-      width: 80%;
-      display: flex;
-      background: #343541;
-      border-radius: 10px;
-      padding: 10px;
-      align-items: center;
+      width:80%;
+      display:flex;
+      background:#343541;
+      border-radius:12px;
+      padding:10px;
+      align-items:center;
     }
 
     input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: white;
-      outline: none;
-      font-size: 15px;
+      flex:1;
+      background:transparent;
+      border:none;
+      color:white;
+      outline:none;
+      font-size:15px;
     }
 
     button {
-      margin-left: 5px;
-      background: #10a37f;
-      border: none;
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
+      margin-left:5px;
+      background:#10a37f;
+      border:none;
+      color:white;
+      padding:10px;
+      border-radius:8px;
+      cursor:pointer;
     }
 
-    button:hover {
-      background: #0e8c6d;
-    }
+    button:hover { background:#0e8c6d; }
 
     .listening {
-      background: red !important;
-      animation: pulse 1s infinite;
+      background:red !important;
+      animation:pulse 1s infinite;
     }
 
     @keyframes pulse {
-      50% { transform: scale(1.2); }
+      50% { transform:scale(1.2); }
     }
 
-    @media(max-width: 768px) {
-      .sidebar { display: none; }
-      .input-box { width: 95%; }
+    @media(max-width:768px){
+      .sidebar{display:none;}
+      .input-box{width:95%;}
     }
+
   </style>
 </head>
 
@@ -119,7 +113,7 @@
 
   <div class="sidebar">
     <h2>🤖 Shlok AI</h2>
-    <p>AI Assistant</p>
+    <p>Smart Voice Assistant</p>
   </div>
 
   <div class="main">
@@ -140,75 +134,118 @@
 
 <script>
 
-// Load chat history
-window.onload = function() {
-  let history = JSON.parse(localStorage.getItem("chat")) || [];
-  history.forEach(m => addMessage(m.text, m.type));
+// Load history
+window.onload = () => {
+  let h = JSON.parse(localStorage.getItem("chat")) || [];
+  h.forEach(m => addMessage(m.text, m.type));
 };
 
-function saveMessage(text, type) {
-  let history = JSON.parse(localStorage.getItem("chat")) || [];
-  history.push({text, type});
-  localStorage.setItem("chat", JSON.stringify(history));
+function save(text,type){
+  let h = JSON.parse(localStorage.getItem("chat")) || [];
+  h.push({text,type});
+  localStorage.setItem("chat", JSON.stringify(h));
 }
 
-function send() {
-  let input = document.getElementById("input");
-  let text = input.value.trim();
-  if (!text) return;
+function send(){
+  let input=document.getElementById("input");
+  let text=input.value.trim();
+  if(!text) return;
 
-  addMessage(text, "user");
-  saveMessage(text, "user");
+  addMessage(text,"user");
+  save(text,"user");
 
-  let botText = "Opening AI in new tab for best answer...";
-  addMessage(botText, "bot");
-  saveMessage(botText, "bot");
+  let typing = addMessage("Thinking...", "bot");
+  
+  setTimeout(()=>{
+    typing.remove();
 
-  input.value = "";
+    let reply = smartAI(text);
+    addMessage(reply,"bot");
+    save(reply,"bot");
 
-  // Open Poe with question
-  let url = "https://poe.com/shlok_ai?q=" + encodeURIComponent(text);
+    speak(reply);
 
-  setTimeout(() => {
-    window.open(url, "_blank");
-  }, 800);
+  },1000);
+
+  input.value="";
 }
 
-function addMessage(text, type) {
-  let chat = document.getElementById("chat");
-
-  let msg = document.createElement("div");
-  msg.className = "msg " + type;
-  msg.innerText = text;
-
-  chat.appendChild(msg);
-  chat.scrollTop = chat.scrollHeight;
+function addMessage(text,type){
+  let chat=document.getElementById("chat");
+  let div=document.createElement("div");
+  div.className="msg "+type;
+  div.innerText=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+  return div;
 }
 
-// Voice input
-function startVoice() {
-  let mic = document.getElementById("mic");
+// 🎤 Voice Input
+function startVoice(){
+  let mic=document.getElementById("mic");
 
-  if (!('webkitSpeechRecognition' in window)) {
-    alert("Voice not supported in this browser");
+  if(!('webkitSpeechRecognition'in window)){
+    alert("Voice not supported");
     return;
   }
 
-  let recognition = new webkitSpeechRecognition();
-  recognition.lang = "en-IN";
-  recognition.start();
+  let rec=new webkitSpeechRecognition();
+  rec.lang="en-IN";
+  rec.start();
 
   mic.classList.add("listening");
 
-  recognition.onresult = function(e) {
-    let speech = e.results[0][0].transcript;
-    document.getElementById("input").value = speech;
+  rec.onresult=e=>{
+    let speech=e.results[0][0].transcript;
+    document.getElementById("input").value=speech;
     send();
   };
 
-  recognition.onend = function() {
-    mic.classList.remove("listening");
-  };
+  rec.onend=()=> mic.classList.remove("listening");
+}
+
+// 🔊 Voice Output
+function speak(text){
+  let speech=new SpeechSynthesisUtterance(text);
+  speech.lang="en-IN";
+  speech.rate=1;
+  speechSynthesis.speak(speech);
+}
+
+// 🧠 Smart AI Brain
+function smartAI(input){
+
+  input=input.toLowerCase();
+
+  if(input.includes("hello")||input.includes("hi"))
+    return "Hello! How can I assist you today?";
+
+  if(input.includes("your name"))
+    return "I am Shlok AI, your smart assistant.";
+
+  if(input.includes("science"))
+    return "Science helps us understand the natural world through experiments and observations.";
+
+  if(input.includes("math"))
+    return "Mathematics deals with numbers, logic, and problem-solving used in daily life.";
+
+  if(input.includes("ai"))
+    return "Artificial Intelligence allows machines to think, learn, and make decisions like humans.";
+
+  if(!isNaN(input))
+    return "The answer is " + eval(input);
+
+  if(input.startsWith("what")||input.startsWith("why")||input.startsWith("how"))
+    return "That is a great question. It involves understanding concepts and ideas related to your query. Let me explain: it is based on logic, knowledge, and real-world understanding.";
+
+  let responses=[
+    "Interesting question! It can be understood with logic and examples.",
+    "I am still learning, but I believe it relates to real-world knowledge.",
+    "That’s a thoughtful question. Let me explain it simply.",
+    "It depends on the situation, but generally it involves reasoning and understanding."
+  ];
+
+  return responses[Math.floor(Math.random()*responses.length)];
 }
 
 </script>

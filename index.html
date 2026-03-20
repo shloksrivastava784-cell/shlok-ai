@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html>
-<link rel="icon" href="logo.png"<meta name="description" content="Shlok AI is a free online AI chatbot that answers questions, helps with studies, coding, and ideas.">
-<meta name="keywords" content="Shlok AI, AI chatbot, free AI, ChatGPT alternative, student AI assistant">
-<meta name="author" content="Shlok Srivastava">>
-  <title>Shlok AI - Free AI Chatbot for Students</title>
+<head>
+  <title>Shlok AI - Free AI Chatbot</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Shlok AI is a free online AI chatbot that answers questions, helps with studies, coding, and ideas.">
+  <meta name="keywords" content="Shlok AI, AI chatbot, free AI, ChatGPT alternative, student AI assistant">
+  <meta name="author" content="Shlok Srivastava">
+
+  <!-- Favicon -->
+  <link rel="icon" href="logo.png">
+
   <style>
     body {
       margin: 0;
       font-family: Arial;
       background: #202123;
-      color: white;<h1 style="display:none;">Shlok AI - Free AI Chatbot</h1>
+      color: white;
     }
 
     .sidebar {
@@ -21,9 +28,15 @@
     }
 
     .logo {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      width: 35px;
+      vertical-align: middle;
+      margin-right: 8px;
     }
 
     .main {
@@ -41,7 +54,7 @@
 
     .msg {
       margin: 10px 0;
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
       max-width: 70%;
     }
@@ -67,6 +80,7 @@
       padding: 12px;
       border-radius: 10px;
       border: none;
+      font-size: 15px;
     }
 
     button {
@@ -74,23 +88,35 @@
       padding: 12px;
       border-radius: 10px;
       border: none;
-      background: #10a37f;
+      background: #6c5ce7;
       color: white;
       cursor: pointer;
     }
 
     button:hover {
-      background: #0e8c6d;
+      background: #5a4bd1;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      padding: 5px;
     }
   </style>
 </head>
+
 <body>
 
+<!-- Hidden SEO heading -->
+<h1 style="display:none;">Shlok AI Free Chatbot</h1>
+
 <div class="sidebar">
- <div class="logo">
-  <img src="logo.png" width="40" style="vertical-align:middle;">
-  Shlok AI
-</div>
+  <div class="logo">
+    <img src="logo.png">
+    Shlok AI
+  </div>
+  <p>Your personal AI assistant</p>
 </div>
 
 <div class="main">
@@ -100,6 +126,10 @@
     <input id="input" placeholder="Ask anything..." />
     <button onclick="send()">Send</button>
   </div>
+
+  <div class="footer">
+    © Shlok Srivastava
+  </div>
 </div>
 
 <script>
@@ -108,7 +138,7 @@ function send() {
   let chat = document.getElementById("chat");
 
   let text = input.value;
-  if(!text) return;
+  if (!text) return;
 
   // User message
   let userMsg = document.createElement("div");
@@ -116,20 +146,19 @@ function send() {
   userMsg.innerText = text;
   chat.appendChild(userMsg);
 
-  // Fake AI typing
+  // AI placeholder
   let botMsg = document.createElement("div");
   botMsg.className = "msg bot";
-  botMsg.innerText = "Thinking...";
+  botMsg.innerText = "Opening AI...";
   chat.appendChild(botMsg);
 
   chat.scrollTop = chat.scrollHeight;
   input.value = "";
 
-  // Redirect to real AI after short delay
+  // Open real AI
   setTimeout(() => {
     window.open("https://poe.com/shlok_ai", "_blank");
-    botMsg.innerText = "Opening AI response in new tab...";
-  }, 1500);
+  }, 1000);
 }
 </script>
 

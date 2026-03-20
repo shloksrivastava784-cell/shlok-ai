@@ -1,120 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Shlok AI - Free AI Chatbot with Voice Assistant</title>
+  <title>Shlok AI - Free AI Chatbot with Voice</title>
 
   <!-- SEO -->
-  <meta name="description" content="Shlok AI is a free AI chatbot with voice input and speaking response. Ask anything and get instant answers.">
-  <meta name="keywords" content="Shlok AI, free AI chatbot, voice AI, ChatGPT alternative, AI for students">
+  <meta name="description" content="Shlok AI is a free AI chatbot with voice input, speaking responses and smart assistant features.">
+  <meta name="keywords" content="Shlok AI, free AI chatbot, voice AI, ChatGPT alternative">
   <meta name="author" content="Shlok Srivastava">
 
-  <!-- Social SEO -->
-  <meta property="og:title" content="Shlok AI - Free AI Chatbot">
-  <meta property="og:description" content="Talk to AI with voice and get instant answers.">
-  <meta property="og:type" content="website">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#343541">
 
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #343541;
-      color: white;
-    }
-
-    .container {
-      display: flex;
-      height: 100vh;
-    }
+    body { margin:0; font-family:Arial; background:#343541; color:white; }
+    .container { display:flex; height:100vh; }
 
     .sidebar {
-      width: 250px;
-      background: #202123;
-      padding: 10px;
+      width:250px; background:#202123; padding:15px;
     }
 
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+    .main { flex:1; display:flex; flex-direction:column; }
 
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
+    #chat { flex:1; overflow-y:auto; padding:15px; }
 
     .msg {
-      padding: 15px;
-      display: flex;
+      padding:10px; margin:8px 0;
+      border-radius:10px; max-width:75%;
+      animation:fade 0.3s;
     }
 
-    .user {
-      justify-content: flex-end;
-    }
+    .user { background:#10a37f; margin-left:auto; }
+    .bot { background:#444654; }
 
-    .bot {
-      background: #444654;
-    }
-
-    .bubble {
-      max-width: 700px;
+    @keyframes fade {
+      from{opacity:0; transform:translateY(10px);}
+      to{opacity:1;}
     }
 
     .input-area {
-      padding: 10px;
-      background: #40414f;
-      display: flex;
-      justify-content: center;
+      padding:10px; background:#40414f;
+      display:flex; justify-content:center;
     }
 
     .input-box {
-      width: 70%;
-      display: flex;
-      background: #343541;
-      border-radius: 10px;
-      padding: 10px;
-      align-items: center;
+      width:80%; display:flex;
+      background:#343541;
+      border-radius:10px;
+      padding:10px;
+      align-items:center;
     }
 
     input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: white;
-      outline: none;
-      font-size: 15px;
+      flex:1; background:transparent;
+      border:none; color:white;
+      outline:none;
     }
 
     button {
-      margin-left: 5px;
-      background: #10a37f;
-      border: none;
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0e8c6d;
+      margin-left:5px;
+      background:#10a37f;
+      border:none; color:white;
+      padding:10px;
+      border-radius:8px;
+      cursor:pointer;
     }
 
     .listening {
-      animation: pulse 1s infinite;
-      background: red !important;
+      background:red !important;
+      animation:pulse 1s infinite;
     }
 
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+      50% { transform:scale(1.2); }
     }
 
-    .content {
-      padding: 20px;
-      color: #ccc;
-      font-size: 14px;
+    /* Popup */
+    .overlay, .popup {
+      display:none; position:fixed;
+    }
+
+    .overlay {
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.7);
+      top:0; left:0; z-index:999;
+    }
+
+    .popup {
+      top:5%; left:10%;
+      width:80%; height:90%;
+      background:white;
+      z-index:1000;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    .popup iframe {
+      width:100%; height:100%;
+      border:none;
+    }
+
+    .close-btn {
+      position:absolute;
+      top:5px; right:10px;
+      background:red; color:white;
+      border:none; padding:5px;
+    }
+
+    @media(max-width:768px){
+      .sidebar{display:none;}
+      .input-box{width:95%;}
     }
   </style>
 </head>
@@ -126,7 +121,8 @@
 <div class="container">
 
   <div class="sidebar">
-    <h3>🤖 Shlok AI</h3>
+    <h2>🤖 Shlok AI</h2>
+    <p>AI Assistant</p>
   </div>
 
   <div class="main">
@@ -141,121 +137,88 @@
       </div>
     </div>
 
-    <!-- SEO Content -->
-    <div class="content">
-      <h2>About Shlok AI</h2>
-      <p>
-        Shlok AI is a powerful free AI chatbot designed for students and users.
-        It supports voice input, speaking responses, and smart replies.
-        If you are searching for Shlok AI, this is the official website.
-      </p>
-    </div>
-
   </div>
 
 </div>
 
+<!-- Popup -->
+<div class="overlay" id="overlay"></div>
+<div class="popup" id="popup">
+  <button class="close-btn" onclick="closePopup()">X</button>
+  <iframe src="https://poe.com/shlok_ai"></iframe>
+</div>
+
 <script>
 
-function send() {
+// Load history
+window.onload = () => {
+  let h = JSON.parse(localStorage.getItem("chat")) || [];
+  h.forEach(m => addMessage(m.text, m.type));
+};
+
+function save(text,type){
+  let h = JSON.parse(localStorage.getItem("chat")) || [];
+  h.push({text,type});
+  localStorage.setItem("chat", JSON.stringify(h));
+}
+
+function send(){
   let input = document.getElementById("input");
-  let chat = document.getElementById("chat");
-
   let text = input.value.trim();
-  if (!text) return;
+  if(!text) return;
 
-  addMessage(text, "user");
+  addMessage(text,"user");
+  save(text,"user");
 
-  let botMsg = addMessage("Thinking...", "bot");
+  let msg = "Opening AI...";
+  addMessage(msg,"bot");
+  save(msg,"bot");
 
-  input.value = "";
-  chat.scrollTop = chat.scrollHeight;
-
-  setTimeout(() => {
-    let reply = generateReply(text);
-    typeText(botMsg, reply);
-    speak(reply);
-  }, 800);
+  input.value="";
+  setTimeout(openPopup,800);
 }
 
-function addMessage(text, type) {
+function addMessage(text,type){
   let chat = document.getElementById("chat");
-
-  let msg = document.createElement("div");
-  msg.className = "msg " + type;
-
-  let bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.innerText = text;
-
-  msg.appendChild(bubble);
-  chat.appendChild(msg);
-
-  return bubble;
+  let div = document.createElement("div");
+  div.className = "msg "+type;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function generateReply(text) {
-  let t = text.toLowerCase();
-
-  if (t.includes("hello") || t.includes("hi"))
-    return "Hello! How can I help you?";
-  if (t.includes("who are you"))
-    return "I am Shlok AI, your assistant.";
-  if (t.includes("study"))
-    return "Study daily and revise regularly.";
-  if (t.includes("code"))
-    return "Practice coding and build projects.";
-  if (t.includes("india"))
-    return "India is a beautiful country with rich culture.";
-
-  return "I am learning. You said: " + text;
-}
-
-function typeText(el, text) {
-  el.innerText = "";
-  let i = 0;
-
-  function typing() {
-    if (i < text.length) {
-      el.innerText += text.charAt(i);
-      i++;
-      setTimeout(typing, 15);
-    }
-  }
-
-  typing();
-}
-
-function startVoice() {
+// Voice input
+function startVoice(){
   let mic = document.getElementById("mic");
 
-  if (!('webkitSpeechRecognition' in window)) {
+  if(!('webkitSpeechRecognition'in window)){
     alert("Voice not supported");
     return;
   }
 
-  let recognition = new webkitSpeechRecognition();
-  recognition.lang = "en-IN";
-  recognition.start();
+  let rec = new webkitSpeechRecognition();
+  rec.lang="en-IN";
+  rec.start();
 
   mic.classList.add("listening");
 
-  recognition.onresult = function(event) {
-    let speech = event.results[0][0].transcript;
-    document.getElementById("input").value = speech;
+  rec.onresult = e=>{
+    document.getElementById("input").value = e.results[0][0].transcript;
     send();
   };
 
-  recognition.onend = function() {
-    mic.classList.remove("listening");
-  };
+  rec.onend = ()=> mic.classList.remove("listening");
 }
 
-function speak(text) {
-  let speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "en-IN";
-  speech.rate = 1;
-  speechSynthesis.speak(speech);
+// Popup
+function openPopup(){
+  document.getElementById("popup").style.display="block";
+  document.getElementById("overlay").style.display="block";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display="none";
+  document.getElementById("overlay").style.display="none";
 }
 
 </script>

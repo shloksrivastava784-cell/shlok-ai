@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Shlok AI</title>
+  <title>Shlok AI - Smart Internet AI</title>
 
   <style>
     body { margin:0; font-family:Arial; background:#343541; color:white;}
@@ -13,6 +13,7 @@
     .msg{
       padding:12px;margin:10px 0;border-radius:12px;
       max-width:70%;animation:fade 0.3s;
+      white-space:pre-line;
     }
 
     .user{background:#10a37f;margin-left:auto;}
@@ -36,6 +37,7 @@
     input{
       flex:1;background:transparent;
       border:none;color:white;outline:none;
+      font-size:15px;
     }
 
     button{
@@ -45,12 +47,19 @@
       cursor:pointer;
     }
 
+    button:hover{background:#0e8c6d;}
+
     .listening{
       background:red!important;
       animation:pulse 1s infinite;
     }
 
     @keyframes pulse{50%{transform:scale(1.2);}}
+
+    @media(max-width:768px){
+      .sidebar{display:none;}
+      .input-box{width:95%;}
+    }
   </style>
 </head>
 
@@ -60,7 +69,7 @@
 
   <div class="sidebar">
     <h2>🤖 Shlok AI</h2>
-    <p>Hybrid AI (Internet + Smart)</p>
+    <p>Internet + Smart AI</p>
   </div>
 
   <div class="main">
@@ -107,32 +116,51 @@ function addMessage(text,type){
   return div;
 }
 
-// 🔥 HYBRID AI (WIKIPEDIA + SMART)
+// 🔥 HYBRID AI (FIXED WIKIPEDIA + SMART)
 async function hybridAI(query, typingMsg){
 
   try{
-    let url = "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(query);
-    let res = await fetch(url);
-    let data = await res.json();
+
+    // STEP 1: Search Wikipedia properly
+    let searchUrl = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" 
+      + encodeURIComponent(query) + "&format=json&origin=*";
+
+    let searchRes = await fetch(searchUrl);
+    let searchData = await searchRes.json();
 
     typingMsg.remove();
 
-    let answer = "";
+    if(searchData.query.search.length > 0){
 
-    if(data.extract){
-      answer = data.extract;
+      let title = searchData.query.search[0].title;
 
-      // enhance with smart AI
+      // STEP 2: Get summary
+      let summaryUrl = "https://en.wikipedia.org/api/rest_v1/page/summary/" 
+        + encodeURIComponent(title);
+
+      let summaryRes = await fetch(summaryUrl);
+      let summaryData = await summaryRes.json();
+
+      let answer = summaryData.extract;
+
+      // Add smart explanation
       answer += "\n\n💡 Explanation: " + smartAI(query);
-    }else{
-      answer = smartAI(query);
+
+      addMessage(answer,"bot");
+      speak(answer);
+
+    } else {
+
+      let fallback = smartAI(query);
+      addMessage(fallback,"bot");
+      speak(fallback);
+
     }
 
-    addMessage(answer,"bot");
-    speak(answer);
+  } catch {
 
-  }catch{
     typingMsg.remove();
+
     let fallback = smartAI(query);
     addMessage(fallback,"bot");
     speak(fallback);
@@ -170,37 +198,37 @@ function speak(text){
   speechSynthesis.speak(speech);
 }
 
-// 🧠 SMART AI BRAIN
+// 🧠 SMART AI
 function smartAI(input){
 
   input=input.toLowerCase();
 
   if(input.includes("hello")||input.includes("hi"))
-    return "Hello! I am your AI assistant. Ask me anything.";
+    return "Hello! I am your AI assistant.";
 
   if(input.includes("ai"))
-    return "AI stands for Artificial Intelligence, which allows machines to learn and think.";
+    return "AI means machines that can think and learn like humans.";
 
   if(input.includes("science"))
-    return "Science helps us understand the world through experiments and observations.";
+    return "Science helps us understand the world through experiments.";
 
   if(!isNaN(input))
     return "The answer is " + eval(input);
 
   if(input.startsWith("why"))
-    return "This happens due to logical or scientific reasons depending on the situation.";
+    return "This happens due to logical or scientific reasons.";
 
   if(input.startsWith("how"))
-    return "It works through a process or steps which explain the concept clearly.";
+    return "It works through steps or processes.";
 
   if(input.startsWith("what"))
-    return "This is a concept that can be understood using knowledge and real-world understanding.";
+    return "This is a concept based on knowledge and understanding.";
 
   let replies=[
-    "This is an interesting topic. It can be better understood with more details.",
-    "I am still learning, but this relates to general knowledge and logic.",
-    "Try asking in a more specific way for a better answer.",
-    "This question involves understanding concepts and real-world ideas."
+    "This is an interesting topic. Try asking more specifically.",
+    "I am still improving, but this relates to general knowledge.",
+    "This involves real-world concepts and logic.",
+    "Try asking in a simpler way for better results."
   ];
 
   return replies[Math.floor(Math.random()*replies.length)];

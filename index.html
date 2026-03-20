@@ -1,122 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Shlok AI - Free AI Chatbot with Voice</title>
+  <title>Shlok AI - Free AI Chatbot</title>
 
-  <!-- SEO -->
-  <meta name="description" content="Shlok AI is a free AI chatbot with voice input, speaking responses and smart assistant features.">
-  <meta name="keywords" content="Shlok AI, free AI chatbot, voice AI, ChatGPT alternative">
-  <meta name="author" content="Shlok Srivastava">
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#343541">
+  <meta name="description" content="Shlok AI is a free AI chatbot with voice input and smart answers.">
 
   <style>
-    body { margin:0; font-family:Arial; background:#343541; color:white; }
-    .container { display:flex; height:100vh; }
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #343541;
+      color: white;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
 
     .sidebar {
-      width:250px; background:#202123; padding:15px;
+      width: 250px;
+      background: #202123;
+      padding: 15px;
     }
 
-    .main { flex:1; display:flex; flex-direction:column; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-    #chat { flex:1; overflow-y:auto; padding:15px; }
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
 
     .msg {
-      padding:10px; margin:8px 0;
-      border-radius:10px; max-width:75%;
-      animation:fade 0.3s;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      max-width: 75%;
+      animation: fade 0.3s ease;
     }
 
-    .user { background:#10a37f; margin-left:auto; }
-    .bot { background:#444654; }
+    .user {
+      background: #10a37f;
+      margin-left: auto;
+    }
+
+    .bot {
+      background: #444654;
+    }
 
     @keyframes fade {
-      from{opacity:0; transform:translateY(10px);}
-      to{opacity:1;}
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1;}
     }
 
     .input-area {
-      padding:10px; background:#40414f;
-      display:flex; justify-content:center;
+      padding: 10px;
+      background: #40414f;
+      display: flex;
+      justify-content: center;
     }
 
     .input-box {
-      width:80%; display:flex;
-      background:#343541;
-      border-radius:10px;
-      padding:10px;
-      align-items:center;
+      width: 80%;
+      display: flex;
+      background: #343541;
+      border-radius: 10px;
+      padding: 10px;
+      align-items: center;
     }
 
     input {
-      flex:1; background:transparent;
-      border:none; color:white;
-      outline:none;
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+      font-size: 15px;
     }
 
     button {
-      margin-left:5px;
-      background:#10a37f;
-      border:none; color:white;
-      padding:10px;
-      border-radius:8px;
-      cursor:pointer;
+      margin-left: 5px;
+      background: #10a37f;
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0e8c6d;
     }
 
     .listening {
-      background:red !important;
-      animation:pulse 1s infinite;
+      background: red !important;
+      animation: pulse 1s infinite;
     }
 
     @keyframes pulse {
-      50% { transform:scale(1.2); }
+      50% { transform: scale(1.2); }
     }
 
-    /* Popup */
-    .overlay, .popup {
-      display:none; position:fixed;
-    }
-
-    .overlay {
-      width:100%; height:100%;
-      background:rgba(0,0,0,0.7);
-      top:0; left:0; z-index:999;
-    }
-
-    .popup {
-      top:5%; left:10%;
-      width:80%; height:90%;
-      background:white;
-      z-index:1000;
-      border-radius:10px;
-      overflow:hidden;
-    }
-
-    .popup iframe {
-      width:100%; height:100%;
-      border:none;
-    }
-
-    .close-btn {
-      position:absolute;
-      top:5px; right:10px;
-      background:red; color:white;
-      border:none; padding:5px;
-    }
-
-    @media(max-width:768px){
-      .sidebar{display:none;}
-      .input-box{width:95%;}
+    @media(max-width: 768px) {
+      .sidebar { display: none; }
+      .input-box { width: 95%; }
     }
   </style>
 </head>
 
 <body>
-
-<h1 style="text-align:center;">Shlok AI - Free AI Chatbot</h1>
 
 <div class="container">
 
@@ -141,84 +138,77 @@
 
 </div>
 
-<!-- Popup -->
-<div class="overlay" id="overlay"></div>
-<div class="popup" id="popup">
-  <button class="close-btn" onclick="closePopup()">X</button>
-  <iframe src="https://poe.com/shlok_ai"></iframe>
-</div>
-
 <script>
 
-// Load history
-window.onload = () => {
-  let h = JSON.parse(localStorage.getItem("chat")) || [];
-  h.forEach(m => addMessage(m.text, m.type));
+// Load chat history
+window.onload = function() {
+  let history = JSON.parse(localStorage.getItem("chat")) || [];
+  history.forEach(m => addMessage(m.text, m.type));
 };
 
-function save(text,type){
-  let h = JSON.parse(localStorage.getItem("chat")) || [];
-  h.push({text,type});
-  localStorage.setItem("chat", JSON.stringify(h));
+function saveMessage(text, type) {
+  let history = JSON.parse(localStorage.getItem("chat")) || [];
+  history.push({text, type});
+  localStorage.setItem("chat", JSON.stringify(history));
 }
 
-function send(){
+function send() {
   let input = document.getElementById("input");
   let text = input.value.trim();
-  if(!text) return;
+  if (!text) return;
 
-  addMessage(text,"user");
-  save(text,"user");
+  addMessage(text, "user");
+  saveMessage(text, "user");
 
-  let msg = "Opening AI...";
-  addMessage(msg,"bot");
-  save(msg,"bot");
+  let botText = "Opening AI in new tab for best answer...";
+  addMessage(botText, "bot");
+  saveMessage(botText, "bot");
 
-  input.value="";
-  setTimeout(openPopup,800);
+  input.value = "";
+
+  // Open Poe with question
+  let url = "https://poe.com/shlok_ai?q=" + encodeURIComponent(text);
+
+  setTimeout(() => {
+    window.open(url, "_blank");
+  }, 800);
 }
 
-function addMessage(text,type){
+function addMessage(text, type) {
   let chat = document.getElementById("chat");
-  let div = document.createElement("div");
-  div.className = "msg "+type;
-  div.innerText = text;
-  chat.appendChild(div);
+
+  let msg = document.createElement("div");
+  msg.className = "msg " + type;
+  msg.innerText = text;
+
+  chat.appendChild(msg);
   chat.scrollTop = chat.scrollHeight;
 }
 
 // Voice input
-function startVoice(){
+function startVoice() {
   let mic = document.getElementById("mic");
 
-  if(!('webkitSpeechRecognition'in window)){
-    alert("Voice not supported");
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("Voice not supported in this browser");
     return;
   }
 
-  let rec = new webkitSpeechRecognition();
-  rec.lang="en-IN";
-  rec.start();
+  let recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-IN";
+  recognition.start();
 
   mic.classList.add("listening");
 
-  rec.onresult = e=>{
-    document.getElementById("input").value = e.results[0][0].transcript;
+  recognition.onresult = function(e) {
+    let speech = e.results[0][0].transcript;
+    document.getElementById("input").value = speech;
     send();
   };
 
-  rec.onend = ()=> mic.classList.remove("listening");
-}
-
-// Popup
-function openPopup(){
-  document.getElementById("popup").style.display="block";
-  document.getElementById("overlay").style.display="block";
-}
-
-function closePopup(){
-  document.getElementById("popup").style.display="none";
-  document.getElementById("overlay").style.display="none";
+  recognition.onend = function() {
+    mic.classList.remove("listening");
+  };
 }
 
 </script>

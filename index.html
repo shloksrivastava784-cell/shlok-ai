@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Shlok AI</title>
+  <title>Shlok AI - Free AI Chatbot with Voice Assistant</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Shlok AI is a free AI chatbot with voice input and speaking response. Ask anything and get instant answers.">
+  <meta name="keywords" content="Shlok AI, free AI chatbot, voice AI, ChatGPT alternative, AI for students">
+  <meta name="author" content="Shlok Srivastava">
+
+  <!-- Social SEO -->
+  <meta property="og:title" content="Shlok AI - Free AI Chatbot">
+  <meta property="og:description" content="Talk to AI with voice and get instant answers.">
+  <meta property="og:type" content="website">
 
   <style>
     body {
@@ -90,7 +100,6 @@
       background: #0e8c6d;
     }
 
-    /* Voice animation */
     .listening {
       animation: pulse 1s infinite;
       background: red !important;
@@ -101,10 +110,18 @@
       50% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
+
+    .content {
+      padding: 20px;
+      color: #ccc;
+      font-size: 14px;
+    }
   </style>
 </head>
 
 <body>
+
+<h1 style="text-align:center;">Shlok AI - Free AI Chatbot</h1>
 
 <div class="container">
 
@@ -122,6 +139,16 @@
         <button id="mic" onclick="startVoice()">🎤</button>
         <button onclick="send()">➤</button>
       </div>
+    </div>
+
+    <!-- SEO Content -->
+    <div class="content">
+      <h2>About Shlok AI</h2>
+      <p>
+        Shlok AI is a powerful free AI chatbot designed for students and users.
+        It supports voice input, speaking responses, and smart replies.
+        If you are searching for Shlok AI, this is the official website.
+      </p>
     </div>
 
   </div>
@@ -184,7 +211,6 @@ function generateReply(text) {
   return "I am learning. You said: " + text;
 }
 
-// Typing effect
 function typeText(el, text) {
   el.innerText = "";
   let i = 0;
@@ -200,7 +226,6 @@ function typeText(el, text) {
   typing();
 }
 
-// Voice input
 function startVoice() {
   let mic = document.getElementById("mic");
 
@@ -210,7 +235,7 @@ function startVoice() {
   }
 
   let recognition = new webkitSpeechRecognition();
-  recognition.lang = "en-IN"; // supports Hindi-English mix
+  recognition.lang = "en-IN";
   recognition.start();
 
   mic.classList.add("listening");
@@ -226,13 +251,10 @@ function startVoice() {
   };
 }
 
-// AI speaking
 function speak(text) {
   let speech = new SpeechSynthesisUtterance(text);
-
-  speech.lang = "en-IN"; // Hindi + English mix
+  speech.lang = "en-IN";
   speech.rate = 1;
-
   speechSynthesis.speak(speech);
 }
 

@@ -12,7 +12,7 @@
       overflow:hidden;
     }
 
-    /* 🌌 Animated Background */
+    /* 🌌 Background */
     body::before {
       content:"";
       position:fixed;
@@ -20,29 +20,14 @@
       height:100%;
       background:linear-gradient(-45deg,#1e1f23,#343541,#202123,#2a2b32);
       background-size:400% 400%;
-      animation:gradient 12s ease infinite;
+      animation:gradient 10s ease infinite;
       z-index:-2;
     }
 
     @keyframes gradient {
-      0%{background-position:0% 50%;}
-      50%{background-position:100% 50%;}
-      100%{background-position:0% 50%;}
-    }
-
-    /* ✨ Floating particles */
-    .particle {
-      position:fixed;
-      width:8px;
-      height:8px;
-      background:rgba(255,255,255,0.2);
-      border-radius:50%;
-      animation:float 8s linear infinite;
-    }
-
-    @keyframes float {
-      from{transform:translateY(100vh);}
-      to{transform:translateY(-10vh);}
+      0%{background-position:0%}
+      50%{background-position:100%}
+      100%{background-position:0%}
     }
 
     .header {
@@ -50,7 +35,6 @@
       padding:12px;
       background:rgba(0,0,0,0.4);
       backdrop-filter:blur(10px);
-      font-size:18px;
       font-weight:bold;
     }
 
@@ -68,7 +52,6 @@
       white-space:pre-wrap;
       word-wrap:break-word;
       line-height:1.5;
-      backdrop-filter:blur(10px);
     }
 
     .user { background:#10a37f; margin-left:auto; }
@@ -127,7 +110,7 @@
 
 <div class="header">
   🤖 Shlok AI Ultra
-  <div class="lang-btn" onclick="toggleLang()">🌍 EN</div>
+  <div class="lang-btn" onclick="toggleLang()">EN</div>
 </div>
 
 <div id="chat"></div>
@@ -142,21 +125,12 @@
 
 <script>
 
-// 🌍 Language system
-let lang = "en";
+// 🌍 Language
+let lang="en";
 
 function toggleLang(){
-  lang = (lang === "en") ? "hi" : "en";
+  lang = (lang==="en") ? "hi" : "en";
   document.querySelector(".lang-btn").innerText = lang.toUpperCase();
-}
-
-// ✨ Particles
-for(let i=0;i<20;i++){
-  let p=document.createElement("div");
-  p.className="particle";
-  p.style.left=Math.random()*100+"%";
-  p.style.animationDuration=(5+Math.random()*5)+"s";
-  document.body.appendChild(p);
 }
 
 // SEND
@@ -191,7 +165,7 @@ function addMessage(text,type){
   return div;
 }
 
-// Typing effect
+// Typing
 function typeEffect(el,text){
   let i=0;
   let interval=setInterval(()=>{
@@ -201,11 +175,37 @@ function typeEffect(el,text){
   },15);
 }
 
+// 🌐 Translate
+async function translateToHindi(text){
+  try{
+    let res = await fetch("https://api.mymemory.translated.net/get?q="
+      + encodeURIComponent(text) + "&langpair=en|hi");
+    let data = await res.json();
+    return data.responseData.translatedText;
+  } catch {
+    return text;
+  }
+}
+
 // 🧠 AI
 async function ultraAI(query,typingMsg){
 
   try{
 
+    // 🧮 MATH DETECTION
+    if(/^[0-9+\-*/(). ]+$/.test(query)){
+      typingMsg.remove();
+      let result = eval(query);
+      let ans = (lang==="hi")
+        ? "🧮 उत्तर: " + result
+        : "🧮 Answer: " + result;
+
+      addMessage(ans,"bot");
+      speak(ans);
+      return;
+    }
+
+    // 🌐 Wikipedia
     let wiki=await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch="
     +encodeURIComponent(query)+"&format=json&origin=*");
 
@@ -216,24 +216,28 @@ async function ultraAI(query,typingMsg){
     if(data.query.search.length>0){
       let title=data.query.search[0].title;
 
-      let sum=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title));
+      let sum=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"
+      +encodeURIComponent(title));
+
       let sumData=await sum.json();
 
-      let ans = sumData.extract;
+      let answer = sumData.extract;
 
       if(lang==="hi"){
-        ans = "🌐 " + ans + "\n\n💡 यह जानकारी विकिपीडिया से ली गई है।";
+        answer = await translateToHindi(answer);
       }
 
-      addMessage(ans,"bot");
-      speak(ans);
-    } else {
-      let ans = lang==="en"
-        ? "Try asking something else."
-        : "कृपया कुछ और पूछें।";
+      addMessage(answer,"bot");
+      speak(answer);
 
-      addMessage(ans,"bot");
-      speak(ans);
+    } else {
+
+      let fallback = (lang==="hi")
+        ? "मुझे उत्तर नहीं मिला, कृपया कुछ और पूछें।"
+        : "I couldn't find an answer.";
+
+      addMessage(fallback,"bot");
+      speak(fallback);
     }
 
   } catch {
@@ -241,7 +245,7 @@ async function ultraAI(query,typingMsg){
   }
 }
 
-// 🎤 Voice
+// 🎤 Voice input
 function startVoice(){
   let rec=new webkitSpeechRecognition();
   rec.lang = (lang==="hi") ? "hi-IN" : "en-IN";

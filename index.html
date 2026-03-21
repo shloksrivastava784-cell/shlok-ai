@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Shlok AI Ultimate Pro</title>
+<title>Shlok AI FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
 margin:0;
 font-family:Arial;
-background:#0f2027;
+background:#1e1f23;
 color:white;
 }
 
@@ -16,15 +16,18 @@ color:white;
 .header{
 display:flex;
 justify-content:space-between;
-padding:10px;
-background:#203a43;
+padding:12px;
+background:#202123;
+position:relative;
+z-index:10;
 }
 
 .lang{
 background:#10a37f;
-padding:5px 10px;
-border-radius:8px;
+padding:6px 12px;
+border-radius:10px;
 cursor:pointer;
+font-weight:bold;
 }
 
 /* CHAT */
@@ -51,7 +54,7 @@ word-break:break-word;
 position:fixed;
 bottom:0;
 width:100%;
-background:#203a43;
+background:#202123;
 padding:10px;
 }
 
@@ -87,7 +90,7 @@ cursor:pointer;
 <body>
 
 <div class="header">
-<div>🚀 Shlok AI Ultimate Pro</div>
+<div>🤖 Shlok AI FINAL</div>
 <div class="lang" onclick="toggleLang()">EN</div>
 </div>
 
@@ -105,7 +108,6 @@ cursor:pointer;
 
 let lang="en";
 
-// LANGUAGE
 function toggleLang(){
 lang = (lang==="en") ? "hi" : "en";
 document.querySelector(".lang").innerText = lang.toUpperCase();
@@ -135,86 +137,77 @@ process(q,typing);
 document.getElementById("input").value="";
 }
 
-// MAIN SYSTEM
+// MAIN FIXED AI
 async function process(q,typing){
 
 try{
 
-// 🧮 MATH
-if(/^[0-9+\-*/(). ]+$/.test(q)){
-typing.innerText = (lang==="hi"?"उत्तर: ":"Answer: ") + eval(q);
-speak(typing.innerText);
-return;
-}
+// 🔥 FIX 1: EXTRACT MATH FROM SENTENCE
+let mathMatch = q.match(/[0-9+\-*/(). ]+/);
 
-// 🤖 TRY REAL AI
-let aiAnswer = await callAI(q);
-
-if(aiAnswer){
-typing.innerText = await translateIfNeeded(aiAnswer);
-speak(typing.innerText);
-return;
-}
-
-// 🌐 FALLBACK WIKIPEDIA
-let wiki = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(q)+"&format=json&origin=*");
-let data = await wiki.json();
-
-if(data.query.search.length>0){
-
-let title=data.query.search[0].title;
-
-let sum=await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title));
-let sumData=await sum.json();
-
-typing.innerText = await translateIfNeeded(sumData.extract);
-speak(typing.innerText);
-
-}else{
-typing.innerText = (lang==="hi")
-? "मुझे उत्तर नहीं मिला।"
-: "I couldn't find an answer.";
-speak(typing.innerText);
-}
-
-}catch{
-typing.innerText="Error occurred";
-}
-}
-
-// 🤖 AI CALL
-async function callAI(q){
+if(mathMatch){
 try{
-let res = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-base",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({inputs:q})
-});
+let result = Function('"use strict";return ('+mathMatch[0]+')')();
+typing.innerText = (lang==="hi"?"उत्तर: ":"Answer: ") + result;
+speak(typing.innerText);
+return;
+}catch{}
+}
+
+// 🌍 HINDI DETECT
+let isHindi = /[\u0900-\u097F]/.test(q);
+
+// 🌐 WIKI SEARCH
+let res = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(q)+"&format=json&origin=*");
 let data = await res.json();
-return data[0]?.generated_text;
+
+if(data.query.search.length === 0){
+typing.innerText = isHindi
+? "मुझे उत्तर नहीं मिला।"
+: "No answer found.";
+speak(typing.innerText);
+return;
+}
+
+let title = data.query.search[0].title;
+
+let sum = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title));
+let sumData = await sum.json();
+
+let answer = sumData.extract;
+
+// 🔁 TRANSLATE
+if(lang==="hi" || isHindi){
+answer = await translate(answer);
+}
+
+typing.innerText = answer;
+speak(answer);
+
 }catch{
-return null;
+typing.innerText="Error";
 }
 }
 
 // TRANSLATE
-async function translateIfNeeded(text){
-if(lang==="hi"){
-let res=await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(text)+"&langpair=en|hi");
-let data=await res.json();
+async function translate(text){
+try{
+let res = await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(text)+"&langpair=en|hi");
+let data = await res.json();
 return data.responseData.translatedText;
-}
+}catch{
 return text;
+}
 }
 
 // VOICE INPUT
 function voice(){
-let r=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-r.lang=(lang==="hi")?"hi-IN":"en-IN";
+let r = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+r.lang = (lang==="hi") ? "hi-IN" : "en-IN";
 r.start();
 
-r.onresult=e=>{
-document.getElementById("input").value=e.results[0][0].transcript;
+r.onresult = e=>{
+document.getElementById("input").value = e.results[0][0].transcript;
 send();
 };
 }
@@ -222,7 +215,7 @@ send();
 // SPEAK
 function speak(text){
 let s=new SpeechSynthesisUtterance(text);
-s.lang=(lang==="hi")?"hi-IN":"en-IN";
+s.lang = (lang==="hi") ? "hi-IN" : "en-IN";
 speechSynthesis.cancel();
 speechSynthesis.speak(s);
 }
